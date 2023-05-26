@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "cropper:block/cropper"
+    },
+    "facing=east": {
+      "model": "cropper:block/cropper_side",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "cropper:block/cropper_side"
+    },
+    "facing=south": {
+      "model": "cropper:block/cropper_side",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "cropper:block/cropper_side",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "H H",
+    "HPH",
+    " H "
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:hopper"
+    },
+    "H": {
+      "item": "minecraft:hay_block"
+    }
+  },
+  "result": {
+    "item": "cropper:cropper"
+  }
+}

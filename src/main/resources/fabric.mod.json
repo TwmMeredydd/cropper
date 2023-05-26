@@ -1,31 +1,42 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "cropper",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Cropper",
+  "description": "A hopper for crops",
   "authors": [
-    "Me!"
+    "Eman7blue"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "http://www.eman7blue.com",
+    "sources": "https://github.com/eman7blue/cropper",
+    "issues": "https://github.com/eman7blue/cropper/issues",
+    "email": "eman7blue@gmail.com"
   },
 
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/modid/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "io.github.eman7blue.cropper.CropperMod"
+    ],
+    "fabric-datagen": [
+      "io.github.eman7blue.cropper.datagen.DataGen"
     ]
   },
   "mixins": [
     "modid.mixins.json"
   ],
-
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/mdSPxJbfBx"
+      }
+    }
+  },
   "depends": {
     "fabricloader": ">=0.14.19",
     "fabric-api": "*",
@@ -33,6 +44,5 @@
     "java": ">=17"
   },
   "suggests": {
-    "another-mod": "*"
   }
 }
