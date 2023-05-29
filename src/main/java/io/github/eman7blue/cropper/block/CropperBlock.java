@@ -71,12 +71,4 @@ public class CropperBlock extends HopperBlock {
             super.onStateReplaced(state, world, pos, newState, moved);
         }
     }
-
-    @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof CropperBlockEntity) {
-            CropperBlockEntity.onEntityCollided(world, pos, state, entity, (CropperBlockEntity)blockEntity);
-        }
-    }
 }

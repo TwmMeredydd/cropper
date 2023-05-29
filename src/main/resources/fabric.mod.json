@@ -4,12 +4,12 @@
   "version": "${version}",
 
   "name": "Cropper",
-  "description": "A hopper for crops",
+  "description": "A hopper for crops!",
   "authors": [
     "Eman7blue"
   ],
   "contact": {
-    "homepage": "http://www.eman7blue.com",
+    "homepage": "https://modrinth.com/mod/cropper",
     "sources": "https://github.com/eman7blue/cropper",
     "issues": "https://github.com/eman7blue/cropper/issues",
     "email": "eman7blue@gmail.com"
@@ -27,9 +27,6 @@
       "io.github.eman7blue.cropper.datagen.DataGen"
     ]
   },
-  "mixins": [
-    "modid.mixins.json"
-  ],
   "custom": {
     "modmenu": {
       "links": {
@@ -40,7 +37,7 @@
   "depends": {
     "fabricloader": ">=0.14.19",
     "fabric-api": "*",
-    "minecraft": "~1.19.4",
+    "minecraft": "*",
     "java": ">=17"
   },
   "suggests": {

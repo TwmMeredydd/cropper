@@ -1,19 +1,21 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "H": {
+      "item": "minecraft:hay_block"
+    },
+    "P": {
+      "item": "minecraft:hopper"
+    }
+  },
   "pattern": [
     "H H",
     "HPH",
     " H "
   ],
-  "key": {
-    "P": {
-      "item": "minecraft:hopper"
-    },
-    "H": {
-      "item": "minecraft:hay_block"
-    }
-  },
   "result": {
     "item": "cropper:cropper"
-  }
+  },
+  "show_notification": true
 }

@@ -10,25 +10,28 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.context.LootContext;
+import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.screen.HopperScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class CropperBlockEntity extends BlockEntity implements Hopper, Inventory, NamedScreenHandlerFactory, Nameable {
@@ -129,7 +132,7 @@ public class CropperBlockEntity extends BlockEntity implements Hopper, Inventory
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return null;
+        return new HopperScreenHandler(syncId, playerInventory, this);
     }
 
     public static void serverTick(World world, BlockPos pos, BlockState state, CropperBlockEntity blockEntity) {
@@ -219,59 +222,30 @@ public class CropperBlockEntity extends BlockEntity implements Hopper, Inventory
         });
     }
 
-    private static boolean isInventoryEmpty(Inventory inv, Direction facing) {
-        return getAvailableSlots(inv, facing).allMatch((slot) -> inv.getStack(slot).isEmpty());
-    }
-
     public static boolean extract(World world, Hopper hopper) {
-        Inventory inventory = getInputInventory(world, hopper);
-        if (inventory != null) {
-            Direction direction = Direction.DOWN;
-            return !isInventoryEmpty(inventory, direction) && getAvailableSlots(inventory, direction).anyMatch((slot) -> extract(hopper, inventory, slot, direction));
-        } else {
-            Iterator<ItemEntity> itemEntityIterator = getInputItemEntities(world, hopper).iterator();
-
-            ItemEntity itemEntity;
-            do {
-                if (!itemEntityIterator.hasNext()) {
-                    return false;
+        BlockPos farmPos = BlockPos.ofFloored(hopper.getHopperX(), hopper.getHopperY() + 1.0, hopper.getHopperZ());
+        if (world.getBlockState(farmPos).isOf(Blocks.FARMLAND)) {
+            BlockPos cropPos = farmPos.up();
+            BlockState cropState = world.getBlockState(cropPos);
+            if (world.getBlockState(cropPos).getBlock() instanceof CropBlock cropBlock) {
+                if (cropBlock.getMaxAge() == cropState.get(cropBlock.getAgeProperty())) {
+                    LootContext.Builder builder = new LootContext.Builder((ServerWorld) world)
+                            .parameter(LootContextParameters.TOOL, ItemStack.EMPTY)
+                            .parameter(LootContextParameters.ORIGIN, farmPos.down().toCenterPos());
+                    List<ItemStack> stacks = cropState.getDroppedStacks(builder);
+                    for (ItemStack stack : stacks) {
+                        ItemStack stack2 = transfer(null, hopper, stack, null);
+                        if (!stack2.isEmpty()) {
+                            ItemEntity entity = new ItemEntity(world, cropPos.getX(), cropPos.getY(), cropPos.getZ(), stack);
+                            world.spawnEntity(entity);
+                        }
+                    }
+                    world.breakBlock(cropPos, false);
+                    return true;
                 }
-
-                itemEntity = itemEntityIterator.next();
-            } while(!extract(hopper, itemEntity));
-
-            return true;
-        }
-    }
-
-    private static boolean extract(Hopper hopper, Inventory inventory, int slot, Direction side) {
-        ItemStack itemStack = inventory.getStack(slot);
-        if (!itemStack.isEmpty() && canExtract(hopper, inventory, itemStack, slot, side)) {
-            ItemStack itemStack2 = itemStack.copy();
-            ItemStack itemStack3 = transfer(inventory, hopper, inventory.removeStack(slot, 1), null);
-            if (itemStack3.isEmpty()) {
-                inventory.markDirty();
-                return true;
             }
-
-            inventory.setStack(slot, itemStack2);
         }
-
         return false;
-    }
-
-    public static boolean extract(Inventory inventory, ItemEntity itemEntity) {
-        boolean bl = false;
-        ItemStack itemStack = itemEntity.getStack().copy();
-        ItemStack itemStack2 = transfer(null, inventory, itemStack, null);
-        if (itemStack2.isEmpty()) {
-            bl = true;
-            itemEntity.discard();
-        } else {
-            itemEntity.setStack(itemStack2);
-        }
-
-        return bl;
     }
 
     public static ItemStack transfer(@Nullable Inventory from, Inventory to, ItemStack stack, @Nullable Direction side) {
@@ -303,18 +277,6 @@ public class CropperBlockEntity extends BlockEntity implements Hopper, Inventory
         } else {
             if (inventory instanceof SidedInventory sidedInventory) {
                 return sidedInventory.canInsert(slot, stack, side);
-            }
-
-            return true;
-        }
-    }
-
-    private static boolean canExtract(Inventory hopperInventory, Inventory fromInventory, ItemStack stack, int slot, Direction facing) {
-        if (!fromInventory.canTransferTo(hopperInventory, slot, stack)) {
-            return false;
-        } else {
-            if (fromInventory instanceof SidedInventory sidedInventory) {
-                return sidedInventory.canExtract(slot, stack, facing);
             }
 
             return true;
@@ -370,16 +332,6 @@ public class CropperBlockEntity extends BlockEntity implements Hopper, Inventory
     }
 
     @Nullable
-    private static Inventory getInputInventory(World world, Hopper hopper) {
-        return getInventoryAt(world, hopper.getHopperX(), hopper.getHopperY() + 1.0, hopper.getHopperZ());
-    }
-
-    public static List<ItemEntity> getInputItemEntities(World world, Hopper hopper) {
-        return hopper.getInputAreaShape().getBoundingBoxes().stream().flatMap((box) ->
-                world.getEntitiesByClass(ItemEntity.class, box.offset(hopper.getHopperX() - 0.5, hopper.getHopperY() - 0.5, hopper.getHopperZ() - 0.5), EntityPredicates.VALID_ENTITY).stream()).collect(Collectors.toList());
-    }
-
-    @Nullable
     public static Inventory getInventoryAt(World world, BlockPos pos) {
         return getInventoryAt(world, (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5);
     }
@@ -422,10 +374,4 @@ public class CropperBlockEntity extends BlockEntity implements Hopper, Inventory
         }
     }
 
-    public static void onEntityCollided(World world, BlockPos pos, BlockState state, Entity entity, CropperBlockEntity blockEntity) {
-        if (entity instanceof ItemEntity && VoxelShapes.matchesAnywhere(VoxelShapes.cuboid(entity.getBoundingBox().offset(-pos.getX(), -pos.getY(), -pos.getZ())), blockEntity.getInputAreaShape(), BooleanBiFunction.AND)) {
-            insertAndExtract(world, pos, state, blockEntity, () -> extract(blockEntity, (ItemEntity)entity));
-        }
-
-    }
 }
