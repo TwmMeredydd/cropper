@@ -28,6 +28,6 @@ public class ModItems {
 
     static {
         CROPPER = new BlockItem(ModBlocks.CROPPER_BLOCK, new FabricItemSettings());
-        CROPPER_MINECART = new CropperMinecartItem(new FabricItemSettings());
+        CROPPER_MINECART = new CropperMinecartItem(new FabricItemSettings().maxCount(1));
     }
 }
