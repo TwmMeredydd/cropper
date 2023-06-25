@@ -1,4 +1,6 @@
 {
   "block.cropper.cropper" : "Cropper",
-  "container.cropper": "Cropper"
+  "container.cropper": "Cropper",
+
+  "item.cropper.cropper_minecart": "Cropper Minecart"
 }
