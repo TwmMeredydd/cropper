@@ -23,6 +23,9 @@
     "main": [
       "io.github.eman7blue.cropper.CropperMod"
     ],
+    "client": [
+      "io.github.eman7blue.cropper.client.CropperModClient"
+    ],
     "fabric-datagen": [
       "io.github.eman7blue.cropper.datagen.DataGen"
     ]

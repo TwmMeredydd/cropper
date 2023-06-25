@@ -2,5 +2,7 @@
   "block.cropper.cropper" : "Cropper",
   "container.cropper": "Cropper",
 
-  "item.cropper.cropper_minecart": "Cropper Minecart"
+  "item.cropper.cropper_minecart": "Cropper Minecart",
+
+  "entity.cropper.cropper_minecart": "Cropper Minecart"
 }
