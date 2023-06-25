@@ -15,6 +15,15 @@ public class CropperMinecartEntity extends HopperMinecartEntity {
         super(entityType, world);
     }
 
+    public static CropperMinecartEntity create(World world, double x, double y, double z) {
+        CropperMinecartEntity entity = new CropperMinecartEntity(ModEntityTypes.CROPPER_MINECART, world);
+        entity.setPosition(x, y, z);
+        entity.prevX = x;
+        entity.prevY = y;
+        entity.prevZ = z;
+        return entity;
+    }
+
     @Override
     protected Item getItem() {
         return ModItems.CROPPER_MINECART;
@@ -42,4 +51,8 @@ public class CropperMinecartEntity extends HopperMinecartEntity {
         return isFull() ? true : CropperBlockEntity.extract(world, this);
     }
 
+    @Override
+    public ItemStack getPickBlockStack() {
+        return new ItemStack(ModItems.CROPPER_MINECART);
+    }
 }
