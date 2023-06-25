@@ -16,7 +16,6 @@ import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
 import net.minecraft.world.event.GameEvent;
 
 public class CropperMinecartItem extends Item {
