@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
+import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.book.RecipeCategory;
 
@@ -36,6 +37,12 @@ public class DataGen implements DataGeneratorEntrypoint {
                     .pattern("H H")
                     .pattern("HPH")
                     .pattern(" H ")
+                    .offerTo(exporter);
+
+            ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.CROPPER_MINECART)
+                    .criterion("has_minecart", InventoryChangedCriterion.Conditions.items(Items.MINECART))
+                    .input(Items.MINECART)
+                    .input(ModItems.CROPPER)
                     .offerTo(exporter);
         }
     }
